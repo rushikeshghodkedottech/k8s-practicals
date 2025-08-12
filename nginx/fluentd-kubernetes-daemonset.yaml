@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-service
+  namespace: nginx-ns
+
+spec:
+  selector:
+    matchLabels:
+      name: fluentd
+  template:
+    metadata:
+      labels:
+        name: fluentd
+    spec:
+      containers:
+        - name: fluentd
+          image: quay.io/fluent/fluentd-kubernetes-daemonset
+          env:
+            - name: FLUENT_ELASTICSEARCH_HOST
+              value: "elasticsearch-logging"  # Ensure this is the correct Elasticsearch service name
+            - name: FLUENT_ELASTICSEARCH_PORT
+              value: "9200"
+            - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
+              value: "true"
+            - name: FLUENT_ELASTICSEARCH_SSL_VERSION
+              value: "TLSv1_2"
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "500m"
